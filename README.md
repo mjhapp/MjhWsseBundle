@@ -26,7 +26,7 @@ new MJH\WsseBundle\MjhWsseBundle(),
 ```
 4.  in security.yml
 
-``` yaml
+``` jinja
 security:
     factories:
         - "%kernel.root_dir%/../vendor/bundles/MJH/WsseBundle/Resources/config/security_factories.xml"
@@ -46,6 +46,7 @@ firewalls:
 5.  entity class for user / consumer / etc.
 
 ``` php
+<?php
 class UserRepository extends EntityRepository implements UserProviderInterface
 {
 
