@@ -4,45 +4,51 @@ Right now, this is basically a direct copy of the Symfony2 Cookbook entry on cre
 
 This is meant to be used for protecting web services on top of Symfony2
 
-Installation:
+Installation
+============
 
-in deps, add
-[MjhWsseBundle] 
-    git=http://github.com/mjhapp/MjhWsseBundle.git 
+1.  in deps, add
+```
+[MjhWsseBundle]
+    git=http://github.com/mjhapp/MjhWsseBundle.git
     target=/bundles/MJH/WsseBundle
-
-add to AppKernel.php
-            new MJH\WsseBundle\MjhWsseBundle(),
-
-add to autoload.php
-    'MJH'                            => __DIR__.'/../vendor/bundles',
-
-in security.yml
+```
+2.  add to AppKernel.php
+```php
+new MJH\WsseBundle\MjhWsseBundle(),
+```
+3.  add to autoload.php
+```php
+'MJH'                            => __DIR__.'/../vendor/bundles',
+```
+4.  in security.yml
+```yaml
 security:
     factories:
-      - "%kernel.root_dir%/../vendor/bundles/MJH/WsseBundle/Resources/config/security_factories.xml"
-    providers:
-      wsse_provider:
+        - "%kernel.root_dir%/../vendor/bundles/MJH/WsseBundle/Resources/config/security_factories.xml"
+providers:
+    wsse_provider:
         entity:
-          class: Acme\DemoBundle\Entity\User  # This Entity class must implement UserProvider
-    firewalls:
-      wsse_secured:
+            class: Acme\DemoBundle\Entity\User  # This Entity class must implement UserProvider
+firewalls:
+    wsse_secured:
         pattern: ^/api/.*
         wsse: true
         provider: wsse_provider
+```
 
 
 
-entity class for user / consumer / etc.
-
+5.  entity class for user / consumer / etc.
+```php
 class UserRepository extends EntityRepository implements UserProviderInterface
 {
 
     /**
-     *
-     * The following functions support UserProviderInterfare requirements for WSSE
-     *
-     */
+    *
+    * The following functions support UserProviderInterfare requirements for WSSE
+    *
+    */
 
     public function loadUserByUsername($username)
     {
@@ -61,3 +67,4 @@ class UserRepository extends EntityRepository implements UserProviderInterface
         return $class === 'Acme\DemoBundle\Entity\User';
     }
 }
+```
