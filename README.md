@@ -8,21 +8,25 @@ Installation
 ============
 
 1.  in deps, add
+
 ```
 [MjhWsseBundle]
     git=http://github.com/mjhapp/MjhWsseBundle.git
     target=/bundles/MJH/WsseBundle
 ```
 2.  add to AppKernel.php
-```php
+
+``` php
 new MJH\WsseBundle\MjhWsseBundle(),
 ```
 3.  add to autoload.php
-```php
+
+``` php
 'MJH'                            => __DIR__.'/../vendor/bundles',
 ```
 4.  in security.yml
-```yaml
+
+``` yaml
 security:
     factories:
         - "%kernel.root_dir%/../vendor/bundles/MJH/WsseBundle/Resources/config/security_factories.xml"
@@ -40,7 +44,8 @@ firewalls:
 
 
 5.  entity class for user / consumer / etc.
-```php
+
+``` php
 class UserRepository extends EntityRepository implements UserProviderInterface
 {
 
