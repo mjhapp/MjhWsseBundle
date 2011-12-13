@@ -46,7 +46,7 @@ class WsseListener implements ListenerInterface
                 } else if ($returnValue instanceof Response) {
                     return $event->setResponse($returnValue);
                 }
-            } catch (AuthenticationException $e) {
+            } catch (\Exception $e) {
               echo "exception caught " . $e->getMessage();
             }
         }

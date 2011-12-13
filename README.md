@@ -4,6 +4,24 @@ Right now, this is basically a direct copy of the Symfony2 Cookbook entry on cre
 
 This is meant to be used for protecting web services on top of Symfony2
 
+To-do
+=====
+ * Annoying: Can't get final compare of signatures to work... Strings are identical and '===' is returning true, but
+    exception is thrown when the function returns.   Returning true manually works fine.  Calculating an SHA1 on each
+    one is also identical.  This needs to be solved asap.
+ * Format timestamp as UTC
+ * Handle timezones appropriately when generating / parsing times
+ * Provide a mechanism to purge expired nonces
+ * Handle curl errors better
+ * Build full headers for the curl request
+ * Provide support for non-curl-enabled installations
+ * Provide extras folder with additional clients
+    - Non-namespaced PHP
+    - Ruby
+    - Javascript
+    - Java
+    - These are probably available already, but should be included
+
 Installation
 ============
 

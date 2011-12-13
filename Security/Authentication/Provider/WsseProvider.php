@@ -21,45 +21,55 @@ class WsseProvider implements AuthenticationProviderInterface
     }
 
     public function authenticate(TokenInterface $token)
-    {        
+    {
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
-        if ( $user && $this->validateDigest($token->digest, $token->getUsername(), $token->nonce, $token->created, $user->getAuthSecret())) {
-            $authenticatedToken = new WsseUserToken(array('IS_AUTHENTICATED'));
-            $authenticatedToken->setUser($user->getAuthToken());
 
-            return $authenticatedToken;
+        if ($user)
+        {
+            $success = $this->validateDigest((string)$token->digest, $token->getUsername(), $token->nonce, $token->created, $user->getAuthSecret());
+            if ( $success )
+            {
+                $authenticatedToken = new WsseUserToken(array('IS_AUTHENTICATED'));
+                $authenticatedToken->setUser($user->getAuthToken());
+
+                return $authenticatedToken;
+            }
         }
-        
         throw new AuthenticationException('The WSSE authentication failed.');
     }
 
-    protected function validateDigest($digest, $username, $nonce, $created, $secret)
+    public function validateDigest($digest, $username, $nonce, $created, $secret)
     {
-//        return true;
-        // Expire timestamp after 5 minutes
-        // Times must be represented in UTC format
-//        if (time() - strtotime($created) > 300) {
-          if (time() - time() > 300 ){
-            return false;
-        }
-        
-//        return true;
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $then = new \Datetime($created, new \DateTimeZone('UTC'));
+        $diff = $now->diff($then, true);
 
-        // Validate nonce is unique within 5 minutes
+        $seconds =
+            ($diff->y * 365 * 24 * 60 * 60) +
+            ($diff->m * 30 * 24 * 60 * 60) +
+            ($diff->d * 24 * 60 * 60) +
+            ($diff->h * 60 *60) +
+            ($diff->i * 60) +
+            ($diff->s)
+        ;
+
+        if ($seconds > 300) {
+            throw new \Exception('Expired timestamp.');
+        }
+
+        // doit: Validate nonce is unique within 5 minutes
         $rep = $this->em->getRepository('MjhWsseBundle:Nonce');
-        
-        if ( !$rep->verifyAndPersistNonce($nonce, $username, 300))
-        {
-          throw new NonceExpiredException('Previously used nonce detected');
-        }
 
-        return true;
+        if (!$rep->verifyAndPersistNonce($nonce, $username, 300)) {
+            throw new NonceExpiredException('Previously used nonce detected');
+        }
 
         // Validate Secret
-        $expected = base64_encode(sha1($nonce.$created.$secret, true));
+        // doit: why won't this work?  the two strings are equal, but an exception is thrown when it returns
+        $expected = base64_encode(sha1($nonce . $created . $secret, true));
 
-        return $digest === $expected;
+        return ( $expected === $digest );
     }
 
     public function supports(TokenInterface $token)
