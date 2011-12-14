@@ -55,7 +55,6 @@ class WsseRequest
         }
 
         $this->digest = base64_encode(sha1($this->nonce.$this->timestamp.$this->secret, true));
-        //$this->digest = sha1($this->nonce.$this->timestamp.$this->secret, true);
     }
 
     public function getDigest()
@@ -66,12 +65,22 @@ class WsseRequest
     private function setTimestamp()
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->timestamp = $now->format('Y-m-d\TH:i:s\Z');
+        $this->timestamp = (string)$now->format('Y-m-d\TH:i:s\Z');
+    }
+
+    private function getTimestamp()
+    {
+        return $this->timestamp;
     }
 
     private function setNonce()
     {
-        $this->nonce = substr( base64_encode(sha1(time() . 'salt')) ,1,8);
+        $this->nonce = substr( base64_encode(sha1(time() . 'salt')) ,0,16);
+    }
+
+    private function getNonce()
+    {
+        return $this->nonce;
     }
 
     private function getWsseHeader()

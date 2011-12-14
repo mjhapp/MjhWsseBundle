@@ -9,12 +9,14 @@
       class="MJH\WsseBundle\Security\Authentication\Provider\WsseProvider" public="false">
         <argument></argument> <!-- User Provider -->
         <argument type="service" id="doctrine.orm.entity_manager" />
+        <!--<argument type="service" id="monolog.logger" />-->
     </service>
 
     <service id="wsse.security.authentication.listener"
       class="MJH\WsseBundle\Security\Firewall\WsseListener" public="false">
         <argument type="service" id="security.context"/>
         <argument type="service" id="security.authentication.manager" />
+
     </service>
     
     <!--

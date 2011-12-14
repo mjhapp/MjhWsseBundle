@@ -8,35 +8,38 @@ use Symfony\Component\Security\Core\Exception\NonceExpiredException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use MJH\WsseBundle\Security\Authentication\Token\WsseUserToken;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
-class WsseProvider implements AuthenticationProviderInterface
+class WsseProvider extends ContainerAware implements AuthenticationProviderInterface
 {
     private $userProvider;
     private $em;
+//    private $logger;
 
-    public function __construct(UserProviderInterface $userProvider, EntityManager $em)
+    public function __construct(
+                                    UserProviderInterface $userProvider,
+                                    EntityManager $em
+//                                    ,$logger
+                                )
     {
         $this->userProvider = $userProvider;
         $this->em = $em;
+//        $this->logger = $logger;
     }
 
     public function authenticate(TokenInterface $token)
     {
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
-
         if ($user)
         {
-            $success = $this->validateDigest((string)$token->digest, $token->getUsername(), $token->nonce, $token->created, $user->getAuthSecret());
-
-            if ( $success )
+            if ( $this->validateDigest((string)$token->digest, $token->getUsername(), $token->nonce, $token->created, $user->getAuthSecret()) )
             {
                 $authenticatedToken = new WsseUserToken(array('IS_AUTHENTICATED'));
                 $authenticatedToken->setUser($user->getAuthToken());
-                //throw new \Exception('just before return ');
-                return $authenticatedToken;
-                return NULL;
+                $authenticatedToken->setAuthenticated(TRUE);
 
+                return $authenticatedToken;
             }
         }
         throw new AuthenticationException('The WSSE authentication failed.');
@@ -69,12 +72,9 @@ class WsseProvider implements AuthenticationProviderInterface
         }
 
         // Validate Secret
-        // doit: why won't this work?  the two strings are equal, but an exception is thrown when it returns
         $expected = base64_encode(sha1($nonce . $created . $secret, true));
-        //$expected = sha1($nonce . $created . $secret, true);
 
-        //throw new \Exception('\n'.$expected.'\n'.$digest);
-        return ( $expected === $digest );
+        return  $expected === $digest;
     }
 
     public function supports(TokenInterface $token)

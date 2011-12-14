@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use MJH\WsseBundle\Entity\Nonce;
 use \DateTime;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 /**
  * NonceRepository
@@ -15,36 +16,39 @@ use \DateTime;
  */
 class NonceRepository extends EntityRepository
 {
-  public function verifyAndPersistNonce($nonce, $username, $duration)
-  {
-    $entity = $this->getEntityManager()
+    public function verifyAndPersistNonce($nonce, $username, $duration = 300)
+    {
+        if (!$nonce)
+        {
+            throw new AuthenticationException('No nonce provided');
+        }
+
+        $noncetime = new DateTime('@'.(time() - $duration), new \DateTimeZone('UTC'));
+
+        $nonces = $this->getEntityManager()
             ->createQuery('SELECT n FROM
               MjhWsseBundle:Nonce n
-              WHERE n.nonce = :nonce AND
-              n.auth_token = :username')
+              WHERE n.nonce = :nonce
+                AND n.auth_token = :username
+                AND n.created_at > :noncetime')
             ->setParameter('nonce', $nonce)
             ->setParameter('username', $username)
-            ->getOneOrNullResult();
-    
-    if (!$entity)
-    { 
-      $newNonce = new Nonce();
-      $newNonce->setNonce( $nonce );
-      $newNonce->setCreatedAt( new DateTime() );
-      $newNonce->setAuthToken( $username );
-      $em = $this->getEntityManager();
-      
-      if ($nonce)
-      {
-        $em->persist($newNonce);
-      $em->flush();
-      }
-      
-      
-      return true;
+            ->setParameter('noncetime', $noncetime->format('Y-m-d\TH:i:s\Z'))
+            ->getResult();
+
+        if ( count($nonces) == 0) {
+            $newNonce = new Nonce();
+            $newNonce->setNonce($nonce);
+            $newNonce->setCreatedAt(new DateTime());
+            $newNonce->setAuthToken($username);
+            $em = $this->getEntityManager();
+
+            $em->persist($newNonce);
+            $em->flush();
+
+            return true;
+        }
+
+        return false;
     }
-    
-    
-    return false;
-  }
 }
