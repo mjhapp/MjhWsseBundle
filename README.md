@@ -103,14 +103,14 @@ class UserRepository extends EntityRepository implements UserProviderInterface
 // SecuredController.php
 
 
-namespace Acme\DemoBundle\SecuredController;
+namespace Acme\DemoBundle\Controller;
 
 ...
 use MJH\WsseBundle\Security\Authentication\Request\WsseRequest;
 ...
 
 
-class DashboardController extends Controller
+class SecuredController extends Controller
 {
 
     public function indexAction(Request $request)
