@@ -6,25 +6,25 @@ This is meant to be used for protecting web services on top of Symfony2
 
 #To-do
 
- * _**DONE!**_ - Annoying: Can't get final compare of signatures to work... Strings are identical and '===' is returning true, but
+ * _**DONE!**_ - ~~Annoying: Can't get final compare of signatures to work... Strings are identical and '===' is returning true, but
     exception is thrown when the function returns.   Returning true manually works fine.  Calculating an SHA1 on each
     one is also identical.  This needs to be solved asap. ... ... ... As it turned out, I had forgotten to set the token
     as authenticated... As a result, the listener was getting called a second time (why?) to validate the new token,
-    which was now sans a timestamp and digest value.
- * _**DONE!**_ - Format timestamp as UTC
- * _**DONE!**_ - Handle timezones appropriately when generating / parsing times
+    which was now sans a timestamp and digest value.~~
+ * _**DONE!**_ - ~~Format timestamp as UTC~~
+ * _**DONE!**_ - ~~Handle timezones appropriately when generating / parsing times~~
  * Provide a mechanism to purge expired nonces
- * _**DONE!**_ - Handle curl errors better
+ * _**DONE!**_ - ~~Handle curl errors better~~
  * Build full headers for the curl request
  * Provide support for non-curl-enabled installations
  * Provide extras folder with additional clients
-    * _**DONE!**_ - Non-namespaced PHP  -- I just stripped the namespace and use off and saved in another file.
+    * _**DONE!**_ - ~~Non-namespaced PHP~~ -- I just stripped the namespace and use off and saved in another file.
     * Ruby
     * Javascript
     * Java
     * These are probably available already, but should be included
   * Clean up commented debug stuff - logging, etc.
-  * _**DONE!**_Create getResponse(), hasError(), getError() in the client class
+  * _**DONE!**_ ~~Create getResponse(), hasError(), getError() in the client class~~
 
 #Installation
 
