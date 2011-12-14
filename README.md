@@ -24,27 +24,28 @@ This is meant to be used for protecting web services on top of Symfony2
     * Java
     * These are probably available already, but should be included
   * Clean up commented debug stuff - logging, etc.
+  * Create getResponse(), hasError(), getError() in the client class
 
 #Installation
 
-1.  in deps, add
+##Update Dependencies
 
 ```
 [MjhWsseBundle]
     git=http://github.com/mjhapp/MjhWsseBundle.git
     target=/bundles/MJH/WsseBundle
 ```
-2.  add to AppKernel.php
+##Update AppKernel.php
 
 ``` php
 new MJH\WsseBundle\MjhWsseBundle(),
 ```
-3.  add to autoload.php
+##Update autoload.php
 
 ``` php
 'MJH'                            => __DIR__.'/../vendor/bundles',
 ```
-4.  in security.yml
+##Update security.yml - add factory, add user provider, add firewall
 
 ``` jinja
 security:
@@ -53,7 +54,7 @@ security:
 providers:
     wsse_provider:
         entity:
-            class: Acme\DemoBundle\Entity\User  # This Entity class must implement UserProvider
+            class: Acme\DemoBundle\Entity\User  # This class must implement UserProviderIterface
 firewalls:
     wsse_secured:
         pattern: ^/api/.*
@@ -63,7 +64,7 @@ firewalls:
 
 
 
-5.  entity class for user / consumer / etc.
+##Implement UserProviderInterface on the class that will be providing user accounts to the security system
 
 ``` php
 <?php
@@ -91,6 +92,39 @@ class UserRepository extends EntityRepository implements UserProviderInterface
     public function supportsClass($class)
     {
         return $class === 'Acme\DemoBundle\Entity\User';
+    }
+}
+```
+
+#Client Usage
+
+```php
+<?php
+// SecuredController.php
+
+
+namespace Acme\DemoBundle\SecuredController;
+
+...
+use MJH\WsseBundle\Security\Authentication\Request\WsseRequest;
+...
+
+
+class DashboardController extends Controller
+{
+
+    public function indexAction(Request $request)
+    {
+        ...
+        $wsseRequest = new WsseRequest('http://theapp.nut/api/v1/getsome.php', null, 'mjhapp','secret');
+
+        $wsseResult = $wsseRequest->sendRequest();  // right now, 'sendRequest()' retuns the result of the curl call
+                                                    // this will change in the next push when error and result methods
+                                                    // are added
+
+        return array(
+           ...
+         );
     }
 }
 ```
