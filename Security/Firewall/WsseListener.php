@@ -41,14 +41,19 @@ class WsseListener implements ListenerInterface
             
             try {
                 $returnValue = $this->authenticationManager->authenticate($token);
+
                 if ($returnValue instanceof TokenInterface) {
-                    return $this->securityContext->setToken($returnValue);
+                    $result = $this->securityContext->setToken($returnValue);
+                    //throw new \Exception($returnValue->getUsername());
+                    return $result;
                 } else if ($returnValue instanceof Response) {
                     return $event->setResponse($returnValue);
                 }
             } catch (\Exception $e) {
               echo "exception caught " . $e->getMessage();
             }
+
+
         }
         $response = new Response();
         $response->setStatusCode(403);

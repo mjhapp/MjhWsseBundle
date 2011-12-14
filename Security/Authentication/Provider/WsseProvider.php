@@ -28,12 +28,15 @@ class WsseProvider implements AuthenticationProviderInterface
         if ($user)
         {
             $success = $this->validateDigest((string)$token->digest, $token->getUsername(), $token->nonce, $token->created, $user->getAuthSecret());
+
             if ( $success )
             {
                 $authenticatedToken = new WsseUserToken(array('IS_AUTHENTICATED'));
                 $authenticatedToken->setUser($user->getAuthToken());
-
+                //throw new \Exception('just before return ');
                 return $authenticatedToken;
+                return NULL;
+
             }
         }
         throw new AuthenticationException('The WSSE authentication failed.');
@@ -55,7 +58,7 @@ class WsseProvider implements AuthenticationProviderInterface
         ;
 
         if ($seconds > 300) {
-            throw new \Exception('Expired timestamp.');
+            throw new \Exception('Expired timestamp.  Seconds: '. $seconds);
         }
 
         // doit: Validate nonce is unique within 5 minutes
@@ -68,7 +71,9 @@ class WsseProvider implements AuthenticationProviderInterface
         // Validate Secret
         // doit: why won't this work?  the two strings are equal, but an exception is thrown when it returns
         $expected = base64_encode(sha1($nonce . $created . $secret, true));
+        //$expected = sha1($nonce . $created . $secret, true);
 
+        //throw new \Exception('\n'.$expected.'\n'.$digest);
         return ( $expected === $digest );
     }
 

@@ -55,6 +55,7 @@ class WsseRequest
         }
 
         $this->digest = base64_encode(sha1($this->nonce.$this->timestamp.$this->secret, true));
+        //$this->digest = sha1($this->nonce.$this->timestamp.$this->secret, true);
     }
 
     public function getDigest()
@@ -64,7 +65,7 @@ class WsseRequest
 
     private function setTimestamp()
     {
-        $now = new \DateTime();
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->timestamp = $now->format('Y-m-d\TH:i:s\Z');
     }
 
