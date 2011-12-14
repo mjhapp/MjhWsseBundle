@@ -14,17 +14,17 @@ This is meant to be used for protecting web services on top of Symfony2
  * _**DONE!**_ - Format timestamp as UTC
  * _**DONE!**_ - Handle timezones appropriately when generating / parsing times
  * Provide a mechanism to purge expired nonces
- * Handle curl errors better
+ * _**DONE!**_ - Handle curl errors better
  * Build full headers for the curl request
  * Provide support for non-curl-enabled installations
  * Provide extras folder with additional clients
-    * Non-namespaced PHP
+    * _**DONE!**_ - Non-namespaced PHP  -- I just stripped the namespace and use off and saved in another file.
     * Ruby
     * Javascript
     * Java
     * These are probably available already, but should be included
   * Clean up commented debug stuff - logging, etc.
-  * Create getResponse(), hasError(), getError() in the client class
+  * _**DONE!**_Create getResponse(), hasError(), getError() in the client class
 
 #Installation
 

@@ -14,30 +14,30 @@ class WsseProvider extends ContainerAware implements AuthenticationProviderInter
 {
     private $userProvider;
     private $em;
-//    private $logger;
 
-    public function __construct(
-                                    UserProviderInterface $userProvider,
-                                    EntityManager $em
-//                                    ,$logger
-                                )
+    public function __construct( UserProviderInterface $userProvider, EntityManager $em )
     {
         $this->userProvider = $userProvider;
         $this->em = $em;
-//        $this->logger = $logger;
     }
 
-    public function authenticate(TokenInterface $token)
+    public function authenticate( TokenInterface $token )
     {
-        $user = $this->userProvider->loadUserByUsername($token->getUsername());
+        $user = $this->userProvider->loadUserByUsername( $token->getUsername() );
 
-        if ($user)
+        if ( $user )
         {
-            if ( $this->validateDigest((string)$token->digest, $token->getUsername(), $token->nonce, $token->created, $user->getAuthSecret()) )
+            if ( $this->validateDigest(
+                (string)$token->digest,
+                $token->getUsername(),
+                $token->nonce,
+                $token->created,
+                $user->getAuthSecret() )
+            )
             {
                 $authenticatedToken = new WsseUserToken(array('IS_AUTHENTICATED'));
-                $authenticatedToken->setUser($user->getAuthToken());
-                $authenticatedToken->setAuthenticated(TRUE);
+                $authenticatedToken->setUser( $user->getAuthToken() );
+                $authenticatedToken->setAuthenticated( TRUE );
 
                 return $authenticatedToken;
             }
@@ -45,39 +45,42 @@ class WsseProvider extends ContainerAware implements AuthenticationProviderInter
         throw new AuthenticationException('The WSSE authentication failed.');
     }
 
-    public function validateDigest($digest, $username, $nonce, $created, $secret)
+    public function validateDigest( $digest, $username, $nonce, $created, $secret )
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $then = new \Datetime($created, new \DateTimeZone('UTC'));
-        $diff = $now->diff($then, true);
+        $diff = $now->diff( $then, true );
 
         $seconds =
             ($diff->y * 365 * 24 * 60 * 60) +
-            ($diff->m * 30 * 24 * 60 * 60) +
-            ($diff->d * 24 * 60 * 60) +
-            ($diff->h * 60 *60) +
-            ($diff->i * 60) +
-            ($diff->s)
-        ;
+                ($diff->m * 30 * 24 * 60 * 60) +
+                ($diff->d * 24 * 60 * 60) +
+                ($diff->h * 60 * 60) +
+                ($diff->i * 60) +
+                ($diff->s);
 
-        if ($seconds > 300) {
-            throw new \Exception('Expired timestamp.  Seconds: '. $seconds);
+        // Validate timestamp is recent within 5 minutes
+        if ( $seconds > 300 )
+        {
+            throw new \Exception('Expired timestamp.  Seconds: ' . $seconds);
         }
 
-        // doit: Validate nonce is unique within 5 minutes
-        $rep = $this->em->getRepository('MjhWsseBundle:Nonce');
+        // Validate nonce is unique within 5 minutes
+        $rep = $this->em->getRepository( 'MjhWsseBundle:Nonce' );
 
-        if (!$rep->verifyAndPersistNonce($nonce, $username, 300)) {
+        if ( !$rep->verifyAndPersistNonce( $nonce, $username, 300 ) )
+        {
             throw new NonceExpiredException('Previously used nonce detected');
         }
 
         // Validate Secret
-        $expected = base64_encode(sha1($nonce . $created . $secret, true));
+        $expected = base64_encode( sha1( $nonce . $created . $secret, true ) );
 
-        return  $expected === $digest;
+        // Return TRUE if our newly-calculated digest is the same as the one provided in the validateDigest() call
+        return $expected === $digest;
     }
 
-    public function supports(TokenInterface $token)
+    public function supports( TokenInterface $token )
     {
         return $token instanceof WsseUserToken;
     }

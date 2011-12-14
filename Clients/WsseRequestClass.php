@@ -1,9 +1,4 @@
 <?php
-namespace MJH\WsseBundle\Security\Authentication\Request;
-
-use \Exception;
-use \DateTime;
-
 class WsseRequest
 {
     private $username;

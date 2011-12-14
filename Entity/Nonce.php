@@ -27,12 +27,12 @@ class Nonce
      * @ORM\Column(name="nonce", type="string", length=255)
      */
     private $nonce;
-    
+
     /**
      * @ORM\Column(name="auth_token", type="string", length=255)
      */
     private $auth_token;
-    
+
     /**
      * @ORM\Column(name="created_at", type="datetime")
      */
@@ -42,7 +42,7 @@ class Nonce
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -54,7 +54,7 @@ class Nonce
      *
      * @param string $nonce
      */
-    public function setNonce($nonce)
+    public function setNonce( $nonce )
     {
         $this->nonce = $nonce;
     }
@@ -62,21 +62,20 @@ class Nonce
     /**
      * Get nonce
      *
-     * @return string 
+     * @return string
      */
     public function getNonce()
     {
         return $this->nonce;
     }
 
-    
 
     /**
      * Set created_at
      *
      * @param datetime $createdAt
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt( $createdAt )
     {
         $this->created_at = $createdAt;
     }
@@ -84,7 +83,7 @@ class Nonce
     /**
      * Get created_at
      *
-     * @return datetime 
+     * @return datetime
      */
     public function getCreatedAt()
     {
@@ -96,7 +95,7 @@ class Nonce
      *
      * @param string $authToken
      */
-    public function setAuthToken($authToken)
+    public function setAuthToken( $authToken )
     {
         $this->auth_token = $authToken;
     }
@@ -104,7 +103,7 @@ class Nonce
     /**
      * Get auth_token
      *
-     * @return string 
+     * @return string
      */
     public function getAuthToken()
     {

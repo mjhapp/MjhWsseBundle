@@ -16,34 +16,35 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  */
 class NonceRepository extends EntityRepository
 {
-    public function verifyAndPersistNonce($nonce, $username, $duration = 300)
+    public function verifyAndPersistNonce( $nonce, $username, $duration = 300 )
     {
-        if (!$nonce)
+        if ( !$nonce )
         {
             throw new AuthenticationException('No nonce provided');
         }
 
-        $noncetime = new DateTime('@'.(time() - $duration), new \DateTimeZone('UTC'));
+        $noncetime = new DateTime('@' . (time() - $duration), new \DateTimeZone('UTC'));
 
         $nonces = $this->getEntityManager()
-            ->createQuery('SELECT n FROM
+            ->createQuery( 'SELECT n FROM
               MjhWsseBundle:Nonce n
               WHERE n.nonce = :nonce
                 AND n.auth_token = :username
-                AND n.created_at > :noncetime')
-            ->setParameter('nonce', $nonce)
-            ->setParameter('username', $username)
-            ->setParameter('noncetime', $noncetime->format('Y-m-d\TH:i:s\Z'))
+                AND n.created_at > :noncetime' )
+            ->setParameter( 'nonce', $nonce )
+            ->setParameter( 'username', $username )
+            ->setParameter( 'noncetime', $noncetime->format( 'Y-m-d\TH:i:s\Z' ) )
             ->getResult();
 
-        if ( count($nonces) == 0) {
+        if ( count( $nonces ) == 0 )
+        {
             $newNonce = new Nonce();
-            $newNonce->setNonce($nonce);
-            $newNonce->setCreatedAt(new DateTime());
-            $newNonce->setAuthToken($username);
+            $newNonce->setNonce( $nonce );
+            $newNonce->setCreatedAt( new DateTime() );
+            $newNonce->setAuthToken( $username );
             $em = $this->getEntityManager();
 
-            $em->persist($newNonce);
+            $em->persist( $newNonce );
             $em->flush();
 
             return true;
