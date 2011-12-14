@@ -23,29 +23,30 @@ This is meant to be used for protecting web services on top of Symfony2
     * Javascript
     * Java
     * These are probably available already, but should be included
-  * Clean up commented debug stuff - logging, etc.
+
+  * _**DONE!**_ ~~ Clean up commented debug stuff - logging, etc.~~
   * _**DONE!**_ ~~Create getResponse(), hasError(), getError() in the client class~~
 
 #Installation
 
-##Update Dependencies
+###Update Dependencies
 
 ```
 [MjhWsseBundle]
     git=http://github.com/mjhapp/MjhWsseBundle.git
     target=/bundles/MJH/WsseBundle
 ```
-##Update AppKernel.php
+###Update AppKernel.php
 
 ``` php
 new MJH\WsseBundle\MjhWsseBundle(),
 ```
-##Update autoload.php
+###Update autoload.php
 
 ``` php
 'MJH'                            => __DIR__.'/../vendor/bundles',
 ```
-##Update security.yml - add factory, add user provider, add firewall
+###Update security.yml - add factory, add user provider, add firewall
 
 ``` jinja
 security:
@@ -64,7 +65,7 @@ firewalls:
 
 
 
-##Implement UserProviderInterface on the class that will be providing user accounts to the security system
+###Implement UserProviderInterface on the class that will be providing user accounts to the security system
 
 ``` php
 <?php
@@ -98,6 +99,8 @@ class UserRepository extends EntityRepository implements UserProviderInterface
 
 #Client Usage
 
+###PHP
+
 ```php
 <?php
 // SecuredController.php
@@ -118,9 +121,17 @@ class SecuredController extends Controller
         ...
         $wsseRequest = new WsseRequest('http://theapp.nut/api/v1/getsome.php', null, 'mjhapp','secret');
 
-        $wsseResult = $wsseRequest->sendRequest();  // right now, 'sendRequest()' retuns the result of the curl call
-                                                    // this will change in the next push when error and result methods
-                                                    // are added
+        $wsseRequest->sendRequest();
+
+        if ( $wsseRequest->hasError() )
+        {
+            $errortext = $wsseRequest->getError();
+            $errorcode = $wsseRequest->getErrorCode();
+        }
+        else
+        {
+            $response = $wsseRequest->getResult();
+        }
 
         return array(
            ...
